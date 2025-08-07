@@ -1,0 +1,33 @@
+name: Build and Push Image
+on: [push]
+
+jobs:
+  build:
+    name: Build and push image
+    runs-on: ubuntu-22.04
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build Image
+        id: build
+        uses: redhat-actions/buildah-build@v2
+        with:
+          image: ${{ github.repository }}
+          tags: latest ${{ github.sha }}
+          containerfiles: |
+            ./Dockerfile
+
+      - name: Push To ghvr.io
+        if: ${{ startsWith(github.ref, 'refs/heads/master') }} # only publish to TestPyPI when it is not a release
+        id: push
+        uses: redhat-actions/push-to-registry@v2
+        with:
+          image: ${{ steps.build.outputs.image }}
+          tags: ${{ steps.build.outputs.tags }}
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ github.token }}
+
+      - name: Print image url
+        run: echo "Image pushed to ${{ steps.push.outputs.registry-paths }}"
