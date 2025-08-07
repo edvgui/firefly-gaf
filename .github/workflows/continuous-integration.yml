@@ -1,23 +1,20 @@
 name: Integration tests
-
-on:
-  push:
-  schedule:
-    - cron:  '0 5 * * *'
+on: [push]
 
 jobs:
-  linting:
-
+  test:
+    name: Validate code quality
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
       - name: Set up Python 3.12
         uses: actions/setup-python@v5
         with:
           python-version: 3.12
-          architecture: 'x64'
+          architecture: "x64"
 
       - name: Install uv
         uses: astral-sh/setup-uv@v6
