@@ -22,14 +22,17 @@ jobs:
 
       - name: Build image
         id: build
-        run: podman build -t ghcr.io/${{ github.repository }} .
+        run: |
+          podman build -t gaf .
+          podman tag gaf ghcr.io/${{ github.repository }}:latest
+          podman tag gaf ghcr.io/${{ github.repository }}:${{ github.sha }}
 
       - name: Push to registry
-        if: ${{ startsWith(github.ref, 'refs/heads/master') }} 
+        #if: ${{ startsWith(github.ref, 'refs/heads/master') }} 
         id: push
         uses: redhat-actions/push-to-registry@v2
         with:
-          image: ghcr.io/edvgui/firefly-gaf
+          image: ghcr.io/${{ github.repository }}
           tags: latest ${{ github.sha }}
           registry: ghcr.io
           username: ${{ github.actor }}
