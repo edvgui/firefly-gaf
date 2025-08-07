@@ -5,6 +5,9 @@ jobs:
   build:
     name: Build and push image
     runs-on: ubuntu-22.04
+    container:
+      image: quay.io/podman/stable:latest
+      options: --privileged
 
     steps:
       - name: Checkout repository
@@ -19,21 +22,15 @@ jobs:
 
       - name: Build image
         id: build
-        uses: redhat-actions/buildah-build@v2
-        with:
-          image: ghcr.io/${{ github.repository }}
-          tags: latest ${{ github.sha }}
-          containerfiles: |
-            ./Containerfile
-          oci: true
+        run: make build
 
       - name: Push to registry
         if: ${{ startsWith(github.ref, 'refs/heads/master') }} 
         id: push
         uses: redhat-actions/push-to-registry@v2
         with:
-          image: ${{ steps.build.outputs.image }}
-          tags: ${{ steps.build.outputs.tags }}
+          image: ghcr.io/edvgui/firefly-gaf
+          tags: latest ${{ github.sha }}
 
       - name: Print image url
         run: echo "Image pushed to ${{ steps.push.outputs.registry-paths }}"
