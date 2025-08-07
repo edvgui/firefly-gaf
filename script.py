@@ -2,7 +2,11 @@
 #
 # /// script
 # requires-python = ">=3.12"
-# dependencies = ["requests", "click", "pydantic"]
+# dependencies = [
+#   "requests>=2.32,<3",
+#   "click>=8.2,<9",
+#   "pydantic>=2.11,<3",
+# ]
 # ///
 
 import logging
