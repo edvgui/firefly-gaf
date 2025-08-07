@@ -9,6 +9,12 @@ jobs:
       image: quay.io/podman/stable:latest
       options: --privileged
 
+    permissions:
+      contents: read
+      packages: write
+      attestations: write
+      id-token: write
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -36,7 +42,7 @@ jobs:
           tags: latest ${{ github.sha }}
           registry: ghcr.io
           username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+          password: ${{ github.token }}
 
       - name: Print image url
         run: echo "Image pushed to ${{ steps.push.outputs.registry-paths }}"
