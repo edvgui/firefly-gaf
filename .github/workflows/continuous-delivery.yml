@@ -7,27 +7,33 @@ jobs:
     runs-on: ubuntu-22.04
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-      - name: Build Image
+      - name: Login to registry
+        uses: redhat-actions/podman-login@v1
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ github.token }}
+
+      - name: Build image
         id: build
         uses: redhat-actions/buildah-build@v2
         with:
-          image: ${{ github.repository }}
+          image: ghcr.io/${{ github.repository }}
           tags: latest ${{ github.sha }}
           containerfiles: |
             ./Dockerfile
+          oci: true
 
-      - name: Push To ghvr.io
-        if: ${{ startsWith(github.ref, 'refs/heads/master') }} # only publish to TestPyPI when it is not a release
+      - name: Push to registry
+        if: ${{ startsWith(github.ref, 'refs/heads/master') }} 
         id: push
         uses: redhat-actions/push-to-registry@v2
         with:
           image: ${{ steps.build.outputs.image }}
           tags: ${{ steps.build.outputs.tags }}
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ github.token }}
 
       - name: Print image url
         run: echo "Image pushed to ${{ steps.push.outputs.registry-paths }}"
