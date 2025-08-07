@@ -22,7 +22,7 @@ jobs:
 
       - name: Build image
         id: build
-        run: make build
+        run: podman build -t ghcr.io/${{ github.repository }} .
 
       - name: Push to registry
         if: ${{ startsWith(github.ref, 'refs/heads/master') }} 
