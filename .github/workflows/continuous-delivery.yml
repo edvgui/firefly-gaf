@@ -19,13 +19,6 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # - name: Login to registry
-      #   uses: redhat-actions/podman-login@v1
-      #   with:
-      #     registry: ghcr.io
-      #     username: ${{ github.actor }}
-      #     password: ${{ github.token }}
-
       - name: Build image
         id: build
         run: |
@@ -34,7 +27,7 @@ jobs:
           podman tag gaf ghcr.io/${{ github.repository }}:${{ github.sha }}
 
       - name: Push to registry
-        #if: ${{ startsWith(github.ref, 'refs/heads/master') }} 
+        if: ${{ startsWith(github.ref, 'refs/heads/master') }} 
         id: push
         uses: redhat-actions/push-to-registry@v2
         with:
