@@ -13,12 +13,12 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Login to registry
-        uses: redhat-actions/podman-login@v1
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ github.token }}
+      # - name: Login to registry
+      #   uses: redhat-actions/podman-login@v1
+      #   with:
+      #     registry: ghcr.io
+      #     username: ${{ github.actor }}
+      #     password: ${{ github.token }}
 
       - name: Build image
         id: build
@@ -31,6 +31,9 @@ jobs:
         with:
           image: ghcr.io/edvgui/firefly-gaf
           tags: latest ${{ github.sha }}
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ github.token }}
 
       - name: Print image url
         run: echo "Image pushed to ${{ steps.push.outputs.registry-paths }}"
