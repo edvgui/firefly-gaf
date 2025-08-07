@@ -10,3 +10,6 @@ format:
 	uv run isort script.py
 	uv run black script.py
 	$(MAKE) lint
+
+build:
+	podman build -t ghcr.io/edvgui/firefly-gaf:latest .

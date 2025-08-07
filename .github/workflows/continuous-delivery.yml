@@ -24,7 +24,7 @@ jobs:
           image: ghcr.io/${{ github.repository }}
           tags: latest ${{ github.sha }}
           containerfiles: |
-            ./Dockerfile
+            ./Containerfile
           oci: true
 
       - name: Push to registry

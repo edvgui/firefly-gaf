@@ -2,8 +2,7 @@
 FROM python:3.12-slim
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
 
-USER root:root
-RUN --mount=type=bind,source=.,target=/tmp/gaf,z <<EOF
+RUN --mount=type=bind,target=/tmp/gaf,z <<EOF
 set -e
 
 # Copy the script to the root of the image
