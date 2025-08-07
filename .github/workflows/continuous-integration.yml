@@ -23,14 +23,10 @@ jobs:
         uses: astral-sh/setup-uv@v6
 
       - name: Install dev dependencies
-        run: |
-          uv venv --python 3.12
-          uv pip install -r requirements.dev.txt
+        run: make install
 
       - name: Lint with flake8 and pyupgrade
-        run: |
-          uv run flake8 script.py
-          uv run pyupgrade --py312-plus script.py
+        run: make lint
 
       - name: Validate basic functionality
         run: ./script.py --help

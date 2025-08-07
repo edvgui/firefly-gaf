@@ -234,7 +234,11 @@ def create_fixing_rule(
     is_flag=True,
     default=False,
     envvar="DRY_RUN",
-    help="When set to true, only perform get requests to the api, and display an overview of the changes that would be made if the script was run without the flag.",
+    help=(
+        "When set to true, only perform get requests to the api, and display "
+        "an overview of the changes that would be made if the script was run "
+        "without the flag."
+    ),
     show_envvar=True,
 )
 @click.argument("account", envvar="ACCOUNT_NAME", nargs=1)
@@ -242,9 +246,9 @@ def main(
     verbose: int, url: str, access_token: str, group: str, dry_run: bool, account: str
 ) -> None:
     """
-    This tool helps you manage and cleanup transactions imported using gocardless for which
-    the destination account is a common payment platform such as visa, by updating the destination
-    account to match the actual business you made the payment to.
+    This tool helps you manage and cleanup transactions imported using gocardless for
+    which the destination account is a common payment platform such as visa, by updating
+    the destination account to match the actual business you made the payment to.
     """
     setup_logging(verbose)
 
@@ -259,8 +263,8 @@ def main(
         )
         LOGGER.info("Authenticated as %s", user["attributes"]["email"])
 
-        # For each account provided, look for transactions that contain a note describing
-        # the true payment beneficiary
+        # For each account provided, look for transactions that contain a note
+        # describing the true payment beneficiary
         missing_rules: set[str] = set()
         for transaction in get_transactions_with_notes(session, account):
             LOGGER.debug(
@@ -292,7 +296,10 @@ def main(
             return
 
         LOGGER.info(
-            "Account %s contains transactions towards %d other beneficiaries, rules will be created for them:\n- %s",
+            (
+                "Account %s contains transactions towards %d other beneficiaries, "
+                "rules will be created for them:\n- %s"
+            ),
             account,
             len(missing_rules),
             "\n- ".join(missing_rules),
