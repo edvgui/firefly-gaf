@@ -286,7 +286,7 @@ def main(
                 continue
 
             # Add the account name to the set of missing rules
-            missing_rules.add(matched.group(1))
+            missing_rules.add(matched.group(1).strip())
 
         if not missing_rules:
             LOGGER.info(
@@ -296,14 +296,13 @@ def main(
             return
 
         LOGGER.info(
-            (
-                "Account %s contains transactions towards %d other beneficiaries, "
-                "rules will be created for them:\n- %s"
-            ),
+            "Account %s contains transactions towards %d other beneficiaries:\n- %s",
             account,
             len(missing_rules),
             "\n- ".join(missing_rules),
         )
+        LOGGER.info("New rules will be created in rule group %s", group)
+
         if dry_run:
             # Nothing else to do, we are in dry-run mode
             return
@@ -311,7 +310,11 @@ def main(
         # Create all the rules, then execute them
         for beneficiary in missing_rules:
             rule = create_fixing_rule(session, account, beneficiary, group)
-            LOGGER.info("Successfully created rule %s (%s)", rule["title"], rule["id"])
+            LOGGER.info(
+                "Successfully created rule %s (%s)",
+                rule["attributes"]["title"],
+                rule["id"],
+            )
 
 
 main()
