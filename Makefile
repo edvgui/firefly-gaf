@@ -1,6 +1,7 @@
 install:
 	ls .venv || uv venv
 	uv pip install -r requirements.dev.txt
+	uv export --script script.py | uv pip install --requirements -
 
 lint:
 	uv run flake8 --max-line-len 88 script.py
