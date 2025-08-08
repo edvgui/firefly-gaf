@@ -94,6 +94,7 @@ All options can be provided via cli or environment variables, when both are used
 
 | Option | Env var | Description |
 | --- | --- | --- |
+| `-l/--log-level` | `LOG_LEVEL` | The log level of the script. |
 | `-u/--url` | `FIREFLY_III_URL` | The url of the firefly instance where the transactions are available. |
 | `-t/--access-token` | `FIREFLY_III_ACCESS_TOKEN` | The firefly user personal access token required to access and modify the user transactions and rules. |
 | `-g/--group` | `FIREFLY_III_RULE_GROUP` | The name of the group in which the rules should be created. |
