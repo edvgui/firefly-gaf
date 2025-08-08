@@ -5,6 +5,7 @@ requires-python = ">=3.12"
 [manifest]
 requirements = [
     { name = "click", specifier = ">=8.2,<9" },
+    { name = "click-loglevel", specifier = ">=0.6,<1" },
     { name = "pydantic", specifier = ">=2.11,<3" },
     { name = "requests", specifier = ">=2.32,<3" },
 ]
@@ -72,6 +73,18 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/60/6c/8ca2efa64cf75a977a0d7fac081354553ebe483345c734fb6b6515d96bbc/click-8.2.1.tar.gz", hash = "sha256:27c491cc05d968d271d5a1db13e3b5a184636d9d930f148c50b038f0d0646202", size = 286342, upload-time = "2025-05-20T23:19:49.832Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/85/32/10bb5764d90a8eee674e9dc6f4db6a0ab47c8c4d0d83c27f7c39ac415a4d/click-8.2.1-py3-none-any.whl", hash = "sha256:61a3265b914e850b85317d0b3109c7f8cd35a670f963866005d6ef1d5175a12b", size = 102215, upload-time = "2025-05-20T23:19:47.796Z" },
+]
+
+[[package]]
+name = "click-loglevel"
+version = "0.6.1"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "click" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/1a/3d/3faf1355e4daf21b0dcb04efe4aa212a82877e610afaf04a74b2266f0ce5/click_loglevel-0.6.1.tar.gz", hash = "sha256:9591fc4bee04b4eb9bde151f9bc756b970f5242161b3eab493af977d4b00bd46", size = 7646, upload-time = "2025-05-11T14:40:31.631Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/69/ea/5defe5e99e7a0f96a58d47ed7b13343a10841cbf0a8817c2e161b7c5a9e6/click_loglevel-0.6.1-py3-none-any.whl", hash = "sha256:9870a9713d386522a3ef159bb4d8f524844fba1cc7fe192a71666ef2fac489f9", size = 5410, upload-time = "2025-05-11T14:40:30.258Z" },
 ]
 
 [[package]]

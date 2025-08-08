@@ -5,6 +5,7 @@
 # dependencies = [
 #   "requests>=2.32,<3",
 #   "click>=8.2,<9",
+#   "click-loglevel>=0.6,<1",
 #   "pydantic>=2.11,<3",
 # ]
 # ///
@@ -16,26 +17,12 @@ import urllib.parse
 from collections.abc import Iterator
 
 import click
+import click_loglevel
 import pydantic
 import requests
 
 LOGGER = logging.getLogger()
 logging.root.addHandler(logging.StreamHandler(sys.stderr))
-
-
-def setup_logging(verbosity: int) -> None:
-    # Setup logging level based on verbosity
-    match verbosity:
-        case 0:
-            LOGGER.setLevel(logging.ERROR)
-        case 1:
-            LOGGER.setLevel(logging.WARNING)
-        case 2:
-            LOGGER.setLevel(logging.INFO)
-        case 3:
-            LOGGER.setLevel(logging.DEBUG)
-        case _:
-            LOGGER.setLevel(0)
 
 
 def process_api_response[T: object](
@@ -195,12 +182,14 @@ def create_fixing_rule(
 
 @click.command()
 @click.option(
-    "--verbose",
-    "-v",
-    count=True,
-    required=False,
-    default=0,
-    help="Verbosity of the script",
+    "-l",
+    "--log-level",
+    type=click_loglevel.LogLevel(),
+    default="INFO",
+    help="Set logging level",
+    show_default=True,
+    show_envvar=True,
+    envvar="LOG_LEVEL",
 )
 @click.option(
     "--url",
@@ -243,14 +232,14 @@ def create_fixing_rule(
 )
 @click.argument("account", envvar="ACCOUNT_NAME", nargs=1)
 def main(
-    verbose: int, url: str, access_token: str, group: str, dry_run: bool, account: str
+    log_level: int, url: str, access_token: str, group: str, dry_run: bool, account: str
 ) -> None:
     """
     This tool helps you manage and cleanup transactions imported using gocardless for
     which the destination account is a common payment platform such as visa, by updating
     the destination account to match the actual business you made the payment to.
     """
-    setup_logging(verbose)
+    LOGGER.setLevel(log_level)
 
     with FireflySession(
         url,
@@ -286,7 +275,7 @@ def main(
                 continue
 
             # Add the account name to the set of missing rules
-            missing_rules.add(matched.group(1))
+            missing_rules.add(matched.group(1).strip())
 
         if not missing_rules:
             LOGGER.info(
@@ -296,14 +285,13 @@ def main(
             return
 
         LOGGER.info(
-            (
-                "Account %s contains transactions towards %d other beneficiaries, "
-                "rules will be created for them:\n- %s"
-            ),
+            "Account %s contains transactions towards %d other beneficiaries:\n- %s",
             account,
             len(missing_rules),
             "\n- ".join(missing_rules),
         )
+        LOGGER.info("New rules will be created in rule group %s", group)
+
         if dry_run:
             # Nothing else to do, we are in dry-run mode
             return
@@ -311,7 +299,11 @@ def main(
         # Create all the rules, then execute them
         for beneficiary in missing_rules:
             rule = create_fixing_rule(session, account, beneficiary, group)
-            LOGGER.info("Successfully created rule %s (%s)", rule["title"], rule["id"])
+            LOGGER.info(
+                "Successfully created rule %s (%s)",
+                rule["attributes"]["title"],
+                rule["id"],
+            )
 
 
 main()
