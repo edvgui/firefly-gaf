@@ -42,5 +42,5 @@ jobs:
 
       - name: Build and push the images
         run: |
-          make REGISTRY=docker.io IMAGE=${{ github.repository }} build
-          make REGISTRY=ghcr.io IMAGE=${{ github.repository }} build
+          make REGISTRY=docker.io IMAGE=${{ github.repository }} build-multi-platform
+          make REGISTRY=ghcr.io IMAGE=${{ github.repository }} build-multi-platform
