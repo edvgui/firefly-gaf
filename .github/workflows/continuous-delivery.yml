@@ -4,10 +4,7 @@ on: [push]
 jobs:
   build:
     name: Build and push image
-    runs-on: ubuntu-24.04
-    container:
-      image: quay.io/podman/stable:latest
-      options: --privileged
+    runs-on: ubuntu-latest
 
     permissions:
       contents: read
@@ -17,25 +14,33 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v4
 
-      - name: Build image
-        id: build
-        run: |
-          podman build -t gaf .
-          podman tag gaf ghcr.io/${{ github.repository }}:latest
-          podman tag gaf ghcr.io/${{ github.repository }}:${{ github.sha }}
+      - name: Enable images push
+        if: startsWith(github.ref, 'refs/heads/master')
+        run: echo "PUSH=true" >> $GITHUB_ENV
 
-      - name: Push to registry
-        if: ${{ startsWith(github.ref, 'refs/heads/master') }} 
-        id: push
-        uses: redhat-actions/push-to-registry@v2
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Authenticate to Docker Hub registry
+        uses: docker/login-action@v3
         with:
-          image: ghcr.io/${{ github.repository }}
-          tags: latest ${{ github.sha }}
+          registry: docker.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.DOCKER_PASS }}
+
+      - name: Authenticate to Github Container registry
+        uses: docker/login-action@v3
+        with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ github.token }}
 
-      - name: Print image url
-        run: echo "Image pushed to ${{ steps.push.outputs.registry-paths }}"
+      - name: Build and push the images
+        run: |
+          make REGISTRY=docker.io IMAGE=${{ github.repository }} build-multi-platform
+          make REGISTRY=ghcr.io IMAGE=${{ github.repository }} build-multi-platform

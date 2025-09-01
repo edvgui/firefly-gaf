@@ -1,3 +1,16 @@
+SHELL := /bin/bash
+
+# Env var inputs for container image builds
+# REGISTRY: The registry to which the build image should be pushed to.
+# IMAGE: The name of the image to build and publish in the afore mentioned registry.
+# PLATFORM: The platform for which the image should be built
+# COMMIT: The commit of this project for which the cli is being built, for reference in the tool's "version" command.
+#         Default to git's HEAD
+REGISTRY ?= docker.io
+IMAGE ?= firefly/gaf
+PLATFORM ?= linux/amd64,linux/arm64
+COMMIT ?= $(shell git rev-parse --verify HEAD)
+
 install:
 	ls .venv || uv venv
 	uv pip install -r requirements.dev.txt
@@ -12,5 +25,14 @@ format:
 	uv run black script.py
 	$(MAKE) lint
 
+build-multi-platform:
+	docker buildx build \
+	$(if $(PUSH),--push) \
+	-t ${REGISTRY}/${IMAGE}:latest \
+	-t ${REGISTRY}/${IMAGE}:${COMMIT} \
+	--platform ${PLATFORM} \
+	-f Containerfile \
+	.
+
 build:
-	podman build -t ghcr.io/edvgui/firefly-gaf:latest .
+	docker build -t ${REGISTRY}/${IMAGE}:latest -f Containerfile .
