@@ -30,7 +30,7 @@ jobs:
         uses: docker/login-action@v3
         with:
           registry: docker.io
-          username: ${{ github.actor }}
+          username: ${{ github.repository_owner }}
           password: ${{ secrets.DOCKER_PASS }}
 
       - name: Authenticate to Github Container registry
