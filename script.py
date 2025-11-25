@@ -143,7 +143,7 @@ def create_fixing_rule(
         # More than one consecutive whitespace in the beneficiary name
         # The full original account expression will be impossible to match
         # because of the how the search engine works and it will not be fixed
-        # cf. https://github.com/firefly-iii/firefly-iii/issues/6121#issuecomment-1143079568
+        # cf. https://github.com/firefly-iii/firefly-iii/issues/6121#issuecomment-1143079568  # noqa: E501
         # Only workaround is to remove what comes after the double whitespace
         # and hope we don't get any overlap with another account
         new_beneficiary = beneficiary[:pos]
