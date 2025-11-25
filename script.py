@@ -139,6 +139,22 @@ def create_fixing_rule(
     account, which has a note containing the rightful beneficiary of the
     transaction. Place the rule in the given group.
     """
+    if (pos := beneficiary.find(" " * 2)) != -1:
+        # More than one consecutive whitespace in the beneficiary name
+        # The full original account expression will be impossible to match
+        # because of the how the search engine works and it will not be fixed
+        # cf. https://github.com/firefly-iii/firefly-iii/issues/6121#issuecomment-1143079568
+        # Only workaround is to remove what comes after the double whitespace
+        # and hope we don't get any overlap with another account
+        new_beneficiary = beneficiary[:pos]
+        LOGGER.warning(
+            "Beneficiary name %s contains multiple consecutive whitespaces. "
+            "The name will be reduced to %s.",
+            repr(beneficiary),
+            repr(new_beneficiary),
+        )
+        beneficiary = new_beneficiary
+
     LOGGER.debug("Creating rule %s in group %s", beneficiary, group)
     rule = process_api_response(
         session.post(
