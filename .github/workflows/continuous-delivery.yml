@@ -49,6 +49,16 @@ jobs:
           make REGISTRY=docker.io IMAGE=${{ github.repository }} METADATA_FILE=metadata-docker.io.json build-multi-platform
           make REGISTRY=ghcr.io IMAGE=${{ github.repository }} METADATA_FILE=metadata-ghcr.io.json build-multi-platform
 
+      - name: Update Docker Hub description
+        if: env.PUSH == 'true'
+        uses: peter-evans/dockerhub-description@v5
+        with:
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.DOCKER_PASS }}
+          repository: ${{ github.repository }}
+          short-description: Firefly III helper that creates rules to sort transactions out of generic payment-provider accounts
+          readme-filepath: ./README.md
+
       - name: Sign the images
         if: env.PUSH == 'true'
         env:
