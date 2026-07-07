@@ -40,7 +40,28 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ github.token }}
 
+      - name: Install cosign
+        if: env.PUSH == 'true'
+        uses: sigstore/cosign-installer@v3
+
       - name: Build and push the images
         run: |
-          make REGISTRY=docker.io IMAGE=${{ github.repository }} build-multi-platform
-          make REGISTRY=ghcr.io IMAGE=${{ github.repository }} build-multi-platform
+          make REGISTRY=docker.io IMAGE=${{ github.repository }} METADATA_FILE=metadata-docker.io.json build-multi-platform
+          make REGISTRY=ghcr.io IMAGE=${{ github.repository }} METADATA_FILE=metadata-ghcr.io.json build-multi-platform
+
+      - name: Sign the images
+        if: env.PUSH == 'true'
+        env:
+          COSIGN_PRIVATE_KEY: ${{ secrets.COSIGN_PRIVATE_KEY }}
+          COSIGN_PASSWORD: ${{ secrets.COSIGN_PASSWORD }}
+        run: |
+          for registry in docker.io ghcr.io; do
+            image="$registry/${{ github.repository }}@$(jq -r '."containerimage.digest"' metadata-$registry.json)"
+
+            # Keyless signature: binds the image to this workflow's identity,
+            # recorded in the public Rekor transparency log
+            cosign sign --yes "$image"
+
+            # Key-based signature: verifiable with this repository's cosign.pub
+            cosign sign --yes --key env://COSIGN_PRIVATE_KEY "$image"
+          done

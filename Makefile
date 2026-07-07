@@ -6,6 +6,7 @@ SHELL := /bin/bash
 # PLATFORM: The platform for which the image should be built
 # COMMIT: The commit of this project for which the cli is being built, for reference in the tool's "version" command.
 #         Default to git's HEAD
+# METADATA_FILE: When set, write build metadata (including the image digest) to this file
 REGISTRY ?= docker.io
 IMAGE ?= firefly/gaf
 PLATFORM ?= linux/amd64,linux/arm64
@@ -28,6 +29,7 @@ format:
 build-multi-platform:
 	docker buildx build \
 	$(if $(PUSH),--push) \
+	$(if $(METADATA_FILE),--metadata-file ${METADATA_FILE}) \
 	-t ${REGISTRY}/${IMAGE}:latest \
 	-t ${REGISTRY}/${IMAGE}:${COMMIT} \
 	--platform ${PLATFORM} \
